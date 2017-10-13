@@ -11,6 +11,32 @@ class Lens:
 	Gaia_end_time = Time('2019-01-01' ,scale='tcb')
 
 	def __init__ (self,id,ra_0,dec_0,pmra,pmdec,epoch_0,scale_in='tcb',format_in='jyear'):
+		"""
+		lens object constructor
+
+		Args:
+			id (long): Lens id as specified by the
+		                         'source_id' column in Gaia
+					 TGAS catalogue
+
+			ra_0 (double): Barycentric right ascension 
+                                       of the source in ICRS at the
+                                       reference epoch Angle [degrees]
+
+			dec_0 (double): Barycentric declination of 
+                                        the source in ICRS at the 
+                                        reference epoch Angle [degress]  
+		
+
+                        pmra (double): Proper motion in right ascension 
+                                       direction Angular Velocity[mas/year]
+
+                        pmdec (double): Proper motion in declination 
+                                        direction Angular Velocity[mas/year]
+
+			epoch_0 (double) : Reference epoch in Julian year 
+                                           with Barycentric coordinate time (TCB)
+		"""
 		self.id = id
 		self.ra_0 = ra_0
 		self.dec_0 = dec_0
