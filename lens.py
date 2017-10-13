@@ -1,5 +1,5 @@
 from astropy.time import Time
-
+import numpy as np
 
 
 class Lens:
@@ -9,6 +9,9 @@ class Lens:
 
 	Gaia_start_time = Time('2014-01-01',scale='tcb')
 	Gaia_end_time = Time('2019-01-01' ,scale='tcb')
+ 
+        #min angular with for lens to pass in front of source [Arcseconds]
+        min_angular_width = 0.7  
 
 	def __init__ (self,id,ra_0,dec_0,pmra,pmdec,epoch_0,scale_in='tcb',format_in='jyear'):
 		"""
@@ -47,7 +50,8 @@ class Lens:
 	def getId(self):
 		return self.id
 
-#        def getRefEpoch(format):
+        def get_ra_cos_dec(ra,dec):
+		return ra * np.cos(dec)
 		
 lens1 = Lens(12,1,2,3,4,5)
 
