@@ -72,23 +72,29 @@ class Lens:
 	def get_GAIA_start_end_coords(self):
 		start= self.get_eq_coords_at_epoch(self.datetime_to_jyTCB(self.GAIA_START))
 		end = self.get_eq_coords_at_epoch(self.datetime_to_jyTCB(self.GAIA_END))
-		return [[start[0],end[0]],[start[1],end[1]]]	
+		return [start,end]	
 
 	def get_lens_box(self):
 		start_end = self.get_GAIA_start_end_coords()
-		deltaX = self.min_angular_width * (start_end[1][0] - start_end[1][1]) / np.sqrt((start_end[0][0] - start_end[0][1])**(2) + (start_end[1][0] - start_end[1][1])**(2))
-		deltaY = self.min_angular_width * (start_end[0][1] - start_end[0][0]) / np.sqrt((start_end[0][0] - start_end[0][1])**(2) + (start_end[1][0] - start_end[1][1])**(2))		
-		print(deltaX)
-		print(deltaY)
-		return [[start_end[0][0] + deltaX,start_end[0][0] - deltaX,start_end[0][1] + deltaX,start_end[0][1] - deltaX],[start_end[1][0] + deltaY,start_end[1][0] - deltaY,start_end[1][1] + deltaY,start_end[1][1] - deltaY]]
+                
+		start = start_end[0]
+		end = start_end[1]
+		
+		hypt = np.sqrt((start[0] - end[0])**(2) + (start[1] - end[1])**(2))
+
+
+		dX = abs(self.min_angular_width * (start[1] - end[1]) / hypt)
+		dY = abs(self.min_angular_width * (start[0] - end[0]) / hypt)		
+		
+		return [[start[0] - dX,start[1] + dY],[start[0] + dX,start[1] - dY],[end[0] + dX,end[1] - dY],[end[0] -dX,end[1] + dY]]
 
 lens1 = Lens(12,1,2,1500000,1500000,2012.0)
 
 
 ans = lens1.getId()
-x = lens1.get_GAIA_start_end_coords()
+x = np.transpose(lens1.get_GAIA_start_end_coords())
 init = lens1.get_eq_coords_at_epoch(2012.0)
-box = lens1.get_lens_box()
+box = np.transpose(lens1.get_lens_box())
 plt.scatter(x[0],x[1])
 plt.scatter(init[0],init[1])
 plt.scatter(box[0],box[1])
