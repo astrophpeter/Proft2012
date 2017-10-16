@@ -43,6 +43,7 @@ class Lens:
 			epoch_0 (double) : Reference epoch in Julian year 
                                            with Barycentric coordinate time (TCB)
 		"""
+		
 		self.id = id
 		self.ra_0 = ra_0
 		self.dec_0 = dec_0
@@ -51,15 +52,43 @@ class Lens:
 		self.epoch_0 = epoch_0
 
                 #Time(epoch_0,scale=scale_in,format=format_in)
-
+        
 	def getId(self):
+		"""
+		Returns the ID of a lens as specified in the
+		source_id column of GAIA TGAS Table.
+
+		Returns:
+			id (long) : source id from source_id
+			column in GAIA TGAS Table.
+		"""
+		
 		return self.id
 
 	def get_eq_coords(self,ra,dec):
+		"""
+		Returns a speficed ra,dec postion in degress
+		in equatorial coordinates [dec*cos(ra),ra] 
+
+		
+		Args: 
+			ra (double) : Barycentric right ascension
+				      [Degrees]
+
+			dec (double): Barycentric declination
+				      [Degrees]
+
+		Reuturns:
+			Eq_coord (array(double)) : Equatorial 
+					coordinates [dec*cos(ra),ra]
+
+		"""
+		
 		return [dec * np.cos(np.deg2rad(ra)),ra]
         
 
 	def get_eq_coords_at_epoch(self,epoch):
+		#need to convert yr^-1 to sec^1
 		ra = self.ra_0 + (epoch - self.epoch_0)* self.pmra * self.mas_to_deg
 		dec = self.dec_0 + (epoch - self.epoch_0) * self.pmdec * self.mas_to_deg
 		return self.get_eq_coords(ra,dec)
