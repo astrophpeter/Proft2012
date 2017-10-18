@@ -1,17 +1,18 @@
 from astropy.time import Time
 import numpy as np
 import matplotlib.pyplot as plt
+import doctest
 
 class Lens:
 
         #rough start and end time for the gaia mission - scaled in
 	#Barycentric coordinate time (TCB)
 
-	GAIA_START = '2014-01-01'
-	GAIA_END = '2019-01-01'
+	GAIA_START = '2013-01-01'
+	GAIA_END = '2025-01-01'
  
         #min angular with for lens to pass in front of source [Arcseconds]
-	min_angular_width = 0.0007  
+	min_angular_width = 0.07  
 
 	#mas to degree conversion
 	mas_to_deg = (1.0 / 3600)*10**(-6)
@@ -57,7 +58,7 @@ class Lens:
 		"""
 		Returns the ID of a lens as specified in the
 		source_id column of GAIA TGAS Table.
-
+               
 		Returns:
 			id (long) : source id from source_id
 			column in GAIA TGAS Table.
@@ -69,8 +70,7 @@ class Lens:
 		"""
 		Returns a speficed ra,dec postion in degress
 		in equatorial coordinates [dec*cos(ra),ra] 
-
-		
+	
 		Args: 
 			ra (double) : Barycentric right ascension
 				      [Degrees]
@@ -80,11 +80,10 @@ class Lens:
 
 		Reuturns:
 			Eq_coord (array(double)) : Equatorial 
-					coordinates [dec*cos(ra),ra]
+					coordinates [ra*cos(dec),dec]
 
-		"""
-		
-		return [dec * np.cos(np.deg2rad(ra)),ra]
+		"""	
+		return [ra* np.cos(np.deg2rad(dec)),dec]
         
 
 	def get_eq_coords_at_epoch(self,epoch):
@@ -112,32 +111,58 @@ class Lens:
 		hypt = np.sqrt((start[0] - end[0])**(2) + (start[1] - end[1])**(2))
 
 
-		dX = abs(self.min_angular_width * (start[1] - end[1]) / hypt)
-		dY = abs(self.min_angular_width * (start[0] - end[0]) / hypt)		
+		dX = abs((1.0/3600)*self.min_angular_width * (start[1] - end[1]) / hypt)
+		dY = abs((1.0/3600)*self.min_angular_width * (start[0] - end[0]) / hypt)		
 		
 		return [[start[0] - dX,start[1] + dY],[start[0] + dX,start[1] - dY],[end[0] + dX,end[1] - dY],[end[0] -dX,end[1] + dY]]
 
-lens1 = Lens(12,1,2,1500000,1500000,2012.0)
+	def get_closest_appr_time(self,bg_ra,bg_dec):
+
+		time = ((bg_ra - self.ra_0) * self.pmra * self.mas_to_deg) + ((bg_dec - self.dec_0) * self.pmdec * self.mas_to_deg) / ((self.pmra*self.mas_to_deg)**2 + (self.pmdec*self.mas_to_deg)**2)
+
+		return time + self.epoch_0
 
 
-ans = lens1.getId()
-x = np.transpose(lens1.get_GAIA_start_end_coords())
-init = lens1.get_eq_coords_at_epoch(2012.0)
-box = np.transpose(lens1.get_lens_box())
-plt.scatter(x[0],x[1])
-plt.scatter(init[0],init[1])
-plt.scatter(box[0],box[1])
-plt.plot(box[0],box[1])
-plt.text(1.996, 1.01, r'Lens with $\delta_{0}=1,\alpha_{0}=2,\mu_{\delta}=\mu_{\alpha}=150$[mas/yr]')
-plt.ylabel(r'$\delta$')
-plt.xlabel(r'$\alpha\cos\delta$')
-plt.text(1.999,1,r't$_{0}$')
-plt.text(2.001,1,r' t$_{GAIA-START}$')
-plt.text(2.003,1.0030,r't$_{GAIA-END}$')
-plt.show()
+#doctest.testmod(extraglobs={'testlens':Lens(0,0,0,0,0,0)})
+
+
+
+#lens1 = Lens(12,1,2,1500000,1500000,2012.0)
+
+
+#ans = lens1.getId()
+#x = np.transpose(lens1.get_GAIA_start_end_coords())
+#init = lens1.get_eq_coords_at_epoch(2012.0)
+#box = np.transpose(lens1.get_lens_box())
+
+
+#plt.scatter(2.001*np.cos(np.deg2rad(1.003)),1.003)
+
+#time_closest = lens1.get_closest_appr_time(1.003,2.001)
+
+#print(time_closest)
+
+#pos_lens_closest = np.transpose(lens1.get_eq_coords_at_epoch(time_closest))
+
+#plt.scatter(pos_lens_closest[0],pos_lens_closest[1])
+
+
+
+
+#plt.scatter(x[0],x[1])
+#plt.scatter(init[0],init[1])
+#plt.scatter(box[0],box[1])
+#plt.plot(box[0],box[1])
+#plt.text(1.996, 1.01, r'Lens with $\delta_{0}=1,\alpha_{0}=2,\mu_{\delta}=\mu_{\alpha}=150$[mas/yr]')
+#plt.ylabel(r'$\delta$')
+#plt.xlabel(r'$\alpha\cos\delta$')
+#plt.text(1.999,1,r't$_{0}$')
+#plt.text(2.001,1,r' t$_{GAIA-START}$')
+#plt.text(2.003,1.0030,r't$_{GAIA-END}$')
+#plt.show()
 #print(y)
-print(x)
+#print(x)
 
-print(ans)
+#print(ans)
 
 
