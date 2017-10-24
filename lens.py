@@ -113,8 +113,16 @@ class Lens:
 
 		dX = abs((1.0/3600)*self.min_angular_width * (start[1] - end[1]) / hypt)
 		dY = abs((1.0/3600)*self.min_angular_width * (start[0] - end[0]) / hypt)		
-		
-		return [[start[0] - dX,start[1] + dY],[start[0] + dX,start[1] - dY],[end[0] + dX,end[1] - dY],[end[0] -dX,end[1] + dY]]
+               
+		#chech all four possibilities of coordinate arrangements
+		if ((start[0] < end[0]) and (start[1] < end[1])):
+			return [[start[0] - dX,start[1] + dY],[start[0] + dX,start[1] - dY],[end[0] + dX,end[1] - dY],[end[0] -dX,end[1] + dY]]
+		elif ((start[0] < end[0]) and (start[1] >  end[1])):
+			return [[start[0] - dX,start[1] - dY],[start[0] + dX,start[1] + dY],[end[0] + dX,end[1] + dY],[end[0] -dX,end[1] - dY]]
+		elif ((start[0] > end[0]) and (start[1] >  end[1])):
+			return [[start[0] - dX,start[1] + dY],[start[0] + dX,start[1] - dY],[end[0] + dX,end[1] - dY],[end[0] -dX,end[1] + dY]]
+		else:
+			return [[start[0] + dX,start[1] + dY],[start[0] - dX,start[1] + dY],[end[0] - dX,end[1] - dY],[end[0] + dX,end[1] + dY]]
 
 	def get_closest_appr_time(self,bg_ra,bg_dec):
 
