@@ -122,7 +122,7 @@ class Lens:
 		elif ((start[0] > end[0]) and (start[1] >  end[1])):
 			return [[start[0] - dX,start[1] + dY],[start[0] + dX,start[1] - dY],[end[0] + dX,end[1] - dY],[end[0] -dX,end[1] + dY]]
 		else:
-			return [[start[0] + dX,start[1] + dY],[start[0] - dX,start[1] + dY],[end[0] - dX,end[1] - dY],[end[0] + dX,end[1] + dY]]
+			return [[start[0] + dX,start[1] + dY],[start[0] - dX,start[1] - dY],[end[0] - dX,end[1] - dY],[end[0] + dX,end[1] + dY]]
 
 	def get_closest_appr_time(self,bg_ra,bg_dec):
 
