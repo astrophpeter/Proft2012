@@ -2,6 +2,8 @@ from astropy.time import Time
 import numpy as np
 import matplotlib.pyplot as plt
 import doctest
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 
 class Lens:
 
@@ -12,10 +14,10 @@ class Lens:
 	GAIA_END = '2025-01-01'
  
         #min angular with for lens to pass in front of source [Arcseconds]
-	min_angular_width = 0.07  
+	min_angular_width = 0.7  
 
 	#mas to degree conversion
-	mas_to_deg = (1.0 / 3600)*10**(-6)
+	mas_to_deg = (1.0 / 3600)*10**(-3)
 
 	def __init__ (self,id,ra_0,dec_0,pmra,pmdec,epoch_0,scale_in='tcb',format_in='jyear'):
 		"""
@@ -45,12 +47,13 @@ class Lens:
                                            with Barycentric coordinate time (TCB)
 		"""
 		
-		self.id = id
-		self.ra_0 = ra_0
-		self.dec_0 = dec_0
-		self.pmra = pmra
-		self.pmdec = pmdec
-		self.epoch_0 = epoch_0
+		self._id = id
+		self._ra_0 = ra_0
+		self._dec_0 = dec_0
+		self._pmra = pmra
+		self._pmdec = pmdec
+		self._epoch_0 = epoch_0
+		self._lens_box = self.get_lens_box()
 
                 #Time(epoch_0,scale=scale_in,format=format_in)
         
@@ -64,7 +67,7 @@ class Lens:
 			column in GAIA TGAS Table.
 		"""
 		
-		return self.id
+		return self._id
 
 	def get_eq_coords(self,ra,dec):
 		"""
@@ -88,8 +91,8 @@ class Lens:
 
 	def get_eq_coords_at_epoch(self,epoch):
 		#need to convert yr^-1 to sec^1
-		ra = self.ra_0 + (epoch - self.epoch_0)* self.pmra * self.mas_to_deg
-		dec = self.dec_0 + (epoch - self.epoch_0) * self.pmdec * self.mas_to_deg
+		ra = self._ra_0 + (epoch - self._epoch_0)* self._pmra * self.mas_to_deg
+		dec = self._dec_0 + (epoch - self._epoch_0) * self._pmdec * self.mas_to_deg
 		return self.get_eq_coords(ra,dec)
 
 	def datetime_to_jyTCB(self,date):
@@ -123,12 +126,19 @@ class Lens:
 			return [[start[0] - dX,start[1] + dY],[start[0] + dX,start[1] - dY],[end[0] + dX,end[1] - dY],[end[0] -dX,end[1] + dY]]
 		else:
 			return [[start[0] + dX,start[1] + dY],[start[0] - dX,start[1] - dY],[end[0] - dX,end[1] - dY],[end[0] + dX,end[1] + dY]]
+	
+	#check if coord is in lens box	
+	def is_coord_in_box(self,ra,dec):
+		point = Point(ra*np.cos(dec),dec)
+		box1 = self._lens_box
+		polygon = Polygon([(box1[0][0],box1[0][1]),(box1[1][0],box1[1][1]),(box1[2][0],box1[2][1]),(box1[3][0],box1[3][1])])
+		return polygon.contains(point)
 
 	def get_closest_appr_time(self,bg_ra,bg_dec):
 
-		time = ((bg_ra - self.ra_0) * self.pmra * self.mas_to_deg) + ((bg_dec - self.dec_0) * self.pmdec * self.mas_to_deg) / ((self.pmra*self.mas_to_deg)**2 + (self.pmdec*self.mas_to_deg)**2)
+		time = ((bg_ra - self._ra_0) * self._pmra * self.mas_to_deg) + ((bg_dec - self._dec_0) * self._pmdec * self.mas_to_deg) / ((self._pmra*self.mas_to_deg)**2 + (self._pmdec*self.mas_to_deg)**2)
 
-		return time + self.epoch_0
+		return time + self._epoch_0
 
 
 #doctest.testmod(extraglobs={'testlens':Lens(0,0,0,0,0,0)})
