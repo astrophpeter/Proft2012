@@ -72,7 +72,7 @@ class Lens:
 	def get_eq_coords(self,ra,dec):
 		"""
 		Returns a speficed ra,dec postion in degress
-		in equatorial coordinates [dec*cos(ra),ra] 
+		in equatorial coordinates [ra*cos(dec),dec] 
 	
 		Args: 
 			ra (double) : Barycentric right ascension
@@ -129,7 +129,7 @@ class Lens:
 	
 	#check if coord is in lens box	
 	def is_coord_in_box(self,ra,dec):
-		point = Point(ra*np.cos(dec),dec)
+		point = Point(ra*np.cos(np.deg2rad(dec)),dec)
 		box1 = self._lens_box
 		polygon = Polygon([(box1[0][0],box1[0][1]),(box1[1][0],box1[1][1]),(box1[2][0],box1[2][1]),(box1[3][0],box1[3][1])])
 		return polygon.contains(point)
