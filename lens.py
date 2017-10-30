@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import doctest
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
+from scipy.optimize import minimize_scalar
 
 class Lens:
 
@@ -134,18 +135,31 @@ class Lens:
 		polygon = Polygon([(box1[0][0],box1[0][1]),(box1[1][0],box1[1][1]),(box1[2][0],box1[2][1]),(box1[3][0],box1[3][1])])
 		return polygon.contains(point)
 
-	def get_closest_appr_time(self,bg_ra,bg_dec):
+	def get_angular_separation_at_epoch(self,epoch,bg_ra,bg_dec):
+         	
+		bg_ra = np.deg2rad(bg_ra)
+		bg_dec = np.deg2rad(bg_dec)		
 
-		time = ((bg_ra - self._ra_0) * self._pmra * self.mas_to_deg) + ((bg_dec - self._dec_0) * self._pmdec * self.mas_to_deg) / ((self._pmra*self.mas_to_deg)**2 + (self._pmdec*self.mas_to_deg)**2)
+		ra = np.deg2rad(self._ra_0 + (epoch - self._epoch_0)* self._pmra * self.mas_to_deg)
+		dec =np.deg2rad(self._dec_0 + (epoch - self._epoch_0) * self._pmdec * self.mas_to_deg)
 
-		return time + self._epoch_0
+		return np.arccos(np.sin(dec)*np.sin(bg_dec) + np.cos(dec)*np.cos(bg_dec)*np.cos(ra-bg_ra)) / (self.mas_to_deg)  
+		
+	def get_time_of_closest_app(self,bg_ra,bg_dec):
 
+		
+		
+		opt = minimize_scalar(lambda epoch: self.get_angular_separation_at_epoch(epoch,bg_ra,bg_dec))
+
+		return opt.x 
 
 #doctest.testmod(extraglobs={'testlens':Lens(0,0,0,0,0,0)})
 
 
 
-#lens1 = Lens(12,1,2,1500000,1500000,2012.0)
+lens1 = Lens(12,36.00001,110.00001,150,150,2012.0)
+
+print(lens1.get_time_of_closest_app(36.00002,110.00002))
 
 
 #ans = lens1.getId()
