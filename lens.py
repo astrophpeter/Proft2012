@@ -143,24 +143,34 @@ class Lens:
 		ra = np.deg2rad(self._ra_0 + (epoch - self._epoch_0)* self._pmra * self.mas_to_deg)
 		dec =np.deg2rad(self._dec_0 + (epoch - self._epoch_0) * self._pmdec * self.mas_to_deg)
 
-		return np.arccos(np.sin(dec)*np.sin(bg_dec) + np.cos(dec)*np.cos(bg_dec)*np.cos(ra-bg_ra)) / (self.mas_to_deg)  
+		return np.rad2deg(np.arccos(np.sin(dec)*np.sin(bg_dec) + np.cos(dec)*np.cos(bg_dec)*np.cos(ra-bg_ra)))  
 		
 	def get_time_of_closest_app(self,bg_ra,bg_dec):
 
 		
 		
-		opt = minimize_scalar(lambda epoch: self.get_angular_separation_at_epoch(epoch,bg_ra,bg_dec))
+		opt = minimize_scalar(lambda epoch: self.get_angular_separation_at_epoch(epoch,bg_ra,bg_dec),method='bounded',bounds=(2013.0,2025.0))
 
-		return opt.x 
+		return opt.success 
 
 #doctest.testmod(extraglobs={'testlens':Lens(0,0,0,0,0,0)})
 
 
 
-lens1 = Lens(12,36.00001,110.00001,150,150,2012.0)
+#lens1 = Lens(12,36.00001,110.00001,150,150,2012.0)
 
-print(lens1.get_time_of_closest_app(36.00002,110.00002))
+#print(lens1.get_time_of_closest_app(36.00002,110.00002))
 
+#sept = []
+#times = np.linspace(2011.0,2013.0,num=50)
+
+#for i in np.linspace(2011.0,2013.0,num=50):	
+#	sept.append(lens1.get_angular_separation_at_epoch(i,36.00002,11.00002))
+
+
+#plt.scatter(times,sept)
+#plt.ylim(-0.001,0.001)
+#plt.show()	
 
 #ans = lens1.getId()
 #x = np.transpose(lens1.get_GAIA_start_end_coords())
