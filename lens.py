@@ -145,13 +145,20 @@ class Lens:
 
 		return np.rad2deg(np.arccos(np.sin(dec)*np.sin(bg_dec) + np.cos(dec)*np.cos(bg_dec)*np.cos(ra-bg_ra)))  
 		
-	def get_time_of_closest_app(self,bg_ra,bg_dec):
+	def get_time_of_closest_app(self,source_ra,source_dec):
 
-		
-		
-		opt = minimize_scalar(lambda epoch: self.get_angular_separation_at_epoch(epoch,bg_ra,bg_dec),method='bounded',bounds=(2013.0,2025.0))
+		pmRaDeg = self._pmra * self.mas_to_deg
+		pmDecDeg = self._pmdec * self.mas_to_deg
 
-		return opt.success 
+		cosSourceDec = np.cos(np.deg2rad(source_dec))
+		cosLensDec = np.cos(np.deg2rad(self._dec_0))
+
+		top = - ((pmDecDeg) * (self._dec_0 - source_dec) + (pmRaDeg * cosLensDec) * (self._ra_0 * cosLensDec - source_ra * cosSourceDec))
+		bottom = (pmDecDeg)**2 + ( pmRaDec * cosLensDec)
+
+		return self._epoch_0 + top / bottom 
+
+
 
 #doctest.testmod(extraglobs={'testlens':Lens(0,0,0,0,0,0)})
 
