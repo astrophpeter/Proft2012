@@ -91,22 +91,80 @@ class Lens:
         
 
 	def get_eq_coords_at_epoch(self,epoch):
-		#need to convert yr^-1 to sec^1
+		"""
+		Returns the equtorial coordinates of the lens
+		and the time epoch.
+
+		Args:
+			epoch (double) : Time at which to get coordinates
+					 Julian year with Barycentric 
+                                         coordinate time (TCB)
+
+		Reutrns:
+			Eq_coord (array(double)) : Coordinates of the lens
+						   at time = epoch in the form
+						   [ra*cos(dec),dec][degrees]
+
+		"""
+	
 		raCosDec = (self._ra_0*np.cos(np.deg2rad(self._dec_0))) + (epoch - self._epoch_0)* self._pmra * self.mas_to_deg
 		dec = self._dec_0 + (epoch - self._epoch_0) * self._pmdec * self.mas_to_deg
+		
 		return [raCosDec,dec]
 
 	def datetime_to_jyTCB(self,date):
+		"""
+		Returns the value of a time in Julian years from a date string
+		of the format 'YYYY-MM-DD' scaled in (TCB)
+
+		Args: 
+			date (string) : string format of the date 'YYYY-MM-DD'
+
+		Returns:
+
+			julianYear (double) : the date in julian years
+
+		"""
+		
 		time = Time(date,scale='tcb')
 		time.format = 'jyear'
+		
 		return time.value
                 
 	def get_GAIA_start_end_coords(self):
+		"""
+		Returns the position of the lens at the start and end times of the 
+		GAIA missin defined by the class constants GAIA_START GAIA_END
+
+		Returns:
+
+			coords (array(double)) : Cordinates of the lens at the
+						 start and end of the gaia mission
+						[[start],[end]] -
+						[[ra * cos(dec),dec] ,[ra*cos(dec),dec]] 
+		"""				[Degrees]
+
 		start= self.get_eq_coords_at_epoch(self.datetime_to_jyTCB(self.GAIA_START))
 		end = self.get_eq_coords_at_epoch(self.datetime_to_jyTCB(self.GAIA_END))
+		
 		return [start,end]	
 
 	def get_lens_box(self):
+		"""
+		Returns a search box of with defined by the class constant 
+		min_angular_width and with length of the GAIA Mission.
+		This used a a search window for other catalogues to
+		find sources the lens passes close to.
+
+		Returns:
+
+			box (array(double)) : Four corners of the search
+					      window box [[x1,y1],[x2,y2],
+					      [x3,y3],[x4,y4]] with format	
+					      [ra*cos(dec),dec][degrees]   
+
+		"""
+
 		start_end = self.get_GAIA_start_end_coords()
                 
 		start = start_end[0]
@@ -138,13 +196,9 @@ class Lens:
 	def get_angular_separation_at_epoch(self,epoch,source_ra,source_dec):
          	
 		cosSourceDec = np.cos(np.deg2rad(source_dec))	
+		coords = self.get_eq_coords_at_epoch(epoch)
 
-		lensRa = self._ra_0 + (epoch - self._epoch_0)* self._pmra * self.mas_to_deg
-		lensDec = self._dec_0 + (epoch - self._epoch_0) * self._pmdec * self.mas_to_deg
-
-		cosLensDec = np.cos(np.deg2rad(lensDec))
-
-		return np.sqrt(((source_dec - lensDec)**2) + (((source_ra * cosSourceDec) - (lensRa * cosLensDec))**2)) 
+		return (np.sqrt(((source_dec - coords[1])**2) + (((source_ra * cosSourceDec) - (coords[0]))**2))) / self.mas_to_deg 
 		
 	def get_time_of_closest_app(self,source_ra,source_dec):
 
@@ -163,56 +217,5 @@ class Lens:
 
 #doctest.testmod(extraglobs={'testlens':Lens(0,0,0,0,0,0)})
 
-
-
-#lens1 = Lens(12,36.00001,110.00001,150,150,2012.0)
-
-#print(lens1.get_time_of_closest_app(36.00002,110.00002))
-
-#sept = []
-#times = np.linspace(2011.0,2013.0,num=50)
-
-#for i in np.linspace(2011.0,2013.0,num=50):	
-#	sept.append(lens1.get_angular_separation_at_epoch(i,36.00002,11.00002))
-
-
-#plt.scatter(times,sept)
-#plt.ylim(-0.001,0.001)
-#plt.show()	
-
-#ans = lens1.getId()
-#x = np.transpose(lens1.get_GAIA_start_end_coords())
-#init = lens1.get_eq_coords_at_epoch(2012.0)
-#box = np.transpose(lens1.get_lens_box())
-
-
-#plt.scatter(2.001*np.cos(np.deg2rad(1.003)),1.003)
-
-#time_closest = lens1.get_closest_appr_time(1.003,2.001)
-
-#print(time_closest)
-
-#pos_lens_closest = np.transpose(lens1.get_eq_coords_at_epoch(time_closest))
-
-#plt.scatter(pos_lens_closest[0],pos_lens_closest[1])
-
-
-
-
-#plt.scatter(x[0],x[1])
-#plt.scatter(init[0],init[1])
-#plt.scatter(box[0],box[1])
-#plt.plot(box[0],box[1])
-#plt.text(1.996, 1.01, r'Lens with $\delta_{0}=1,\alpha_{0}=2,\mu_{\delta}=\mu_{\alpha}=150$[mas/yr]')
-#plt.ylabel(r'$\delta$')
-#plt.xlabel(r'$\alpha\cos\delta$')
-#plt.text(1.999,1,r't$_{0}$')
-#plt.text(2.001,1,r' t$_{GAIA-START}$')
-#plt.text(2.003,1.0030,r't$_{GAIA-END}$')
-#plt.show()
-#print(y)
-#print(x)
-
-#print(ans)
 
 
