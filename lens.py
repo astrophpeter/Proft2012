@@ -106,11 +106,13 @@ class Lens:
 						   [ra*cos(dec),dec][degrees]
 
 		"""
-	
+		#ra = self._ra_0 + (epoch - self._epoch_0) * self._pmra * self.mas_to_deg
 		raCosDec = (self._ra_0*np.cos(np.deg2rad(self._dec_0))) + (epoch - self._epoch_0)* self._pmra * self.mas_to_deg
 		dec = self._dec_0 + (epoch - self._epoch_0) * self._pmdec * self.mas_to_deg
 		
 		return [raCosDec,dec]
+
+		#return self.get_eq_coords(ra,dec)
 
 	def datetime_to_jyTCB(self,date):
 		"""
@@ -142,7 +144,8 @@ class Lens:
 						 start and end of the gaia mission
 						[[start],[end]] -
 						[[ra * cos(dec),dec] ,[ra*cos(dec),dec]] 
-		"""				[Degrees]
+						[Degrees]
+		"""
 
 		start= self.get_eq_coords_at_epoch(self.datetime_to_jyTCB(self.GAIA_START))
 		end = self.get_eq_coords_at_epoch(self.datetime_to_jyTCB(self.GAIA_END))
