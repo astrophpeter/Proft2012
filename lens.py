@@ -135,15 +135,16 @@ class Lens:
 		polygon = Polygon([(box1[0][0],box1[0][1]),(box1[1][0],box1[1][1]),(box1[2][0],box1[2][1]),(box1[3][0],box1[3][1])])
 		return polygon.contains(point)
 
-	def get_angular_separation_at_epoch(self,epoch,bg_ra,bg_dec):
+	def get_angular_separation_at_epoch(self,epoch,source_ra,source_dec):
          	
-		bg_ra = np.deg2rad(bg_ra)
-		bg_dec = np.deg2rad(bg_dec)		
+		cosSourceDec = np.cos(np.deg2rad(source_dec))	
 
-		ra = np.deg2rad(self._ra_0 + (epoch - self._epoch_0)* self._pmra * self.mas_to_deg)
-		dec =np.deg2rad(self._dec_0 + (epoch - self._epoch_0) * self._pmdec * self.mas_to_deg)
+		lensRa = self._ra_0 + (epoch - self._epoch_0)* self._pmra * self.mas_to_deg
+		lensDec = self._dec_0 + (epoch - self._epoch_0) * self._pmdec * self.mas_to_deg
 
-		return np.rad2deg(np.arccos(np.sin(dec)*np.sin(bg_dec) + np.cos(dec)*np.cos(bg_dec)*np.cos(ra-bg_ra)))  
+		cosLensDec = np.cos(np.deg2rad(lensDec))
+
+		return np.sqrt(((source_dec - lensDec)**2) + (((source_ra * cosSourceDec) - (lensRa * cosLensDec))**2)) 
 		
 	def get_time_of_closest_app(self,source_ra,source_dec):
 
@@ -153,8 +154,8 @@ class Lens:
 		cosSourceDec = np.cos(np.deg2rad(source_dec))
 		cosLensDec = np.cos(np.deg2rad(self._dec_0))
 
-		top = - ((pmDecDeg) * (self._dec_0 - source_dec) + (pmRaDeg * cosLensDec) * (self._ra_0 * cosLensDec - source_ra * cosSourceDec))
-		bottom = (pmDecDeg)**2 + ( pmRaDec * cosLensDec)
+		top = - (((pmDecDeg) * (self._dec_0 - source_dec)) + (pmRaDeg) * ((self._ra_0 * cosLensDec) - (source_ra * cosSourceDec)))
+		bottom = (pmDecDeg)**2 + (pmRaDeg)**2
 
 		return self._epoch_0 + top / bottom 
 
