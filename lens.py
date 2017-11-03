@@ -92,9 +92,9 @@ class Lens:
 
 	def get_eq_coords_at_epoch(self,epoch):
 		#need to convert yr^-1 to sec^1
-		ra = self._ra_0 + (epoch - self._epoch_0)* self._pmra * self.mas_to_deg
+		raCosDec = (self._ra_0*np.cos(np.deg2rad(self._dec_0))) + (epoch - self._epoch_0)* self._pmra * self.mas_to_deg
 		dec = self._dec_0 + (epoch - self._epoch_0) * self._pmdec * self.mas_to_deg
-		return self.get_eq_coords(ra,dec)
+		return [raCosDec,dec]
 
 	def datetime_to_jyTCB(self,date):
 		time = Time(date,scale='tcb')
