@@ -225,11 +225,11 @@ class Lens:
 		return polygon.contains(point)
 
 	def get_angular_separation_at_epoch(self,epoch,source_ra,source_dec):
-         	"""
+		"""
 		Returns the agular separation between the lens and source
 		at time epoch assuming the source does not move.
 		Implemented using the distance formula in (2.1) in
-		"Candidate Lensing Events for Gaia" doc.
+		Candidate Lensing Events for Gaia - doc.
 
 		Args: 
 			epoch (double):  Time at which to find separation epoch 
@@ -257,7 +257,7 @@ class Lens:
 		Returns the time of closest approach between a 
 		lens and source assuming tha the source does not
 		move. Implemented using formula (1) in 
-		"Candidate Lensing Events for Gaia" doc.
+		Candidate Lensing Events for Gaia doc.
 		
 		Args:
 			source_ra (double) : Barycentric right ascension of source
