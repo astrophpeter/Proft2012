@@ -276,7 +276,7 @@ class Lens:
 		#note this term already includes the cos(dec)
 		pmRaDeg = self._pmra * self.mas_to_deg
 		
-		#convert \mu_{\dec *} from [mas/yr] to [deg/yr]
+		#convert \mu_{\dec} from [mas/yr] to [deg/yr]
 		pmDecDeg = self._pmdec * self.mas_to_deg
 
                 #pre compute some frequently used quantities 
