@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-
-
+from astropy.coordinates import SkyCoord
+import numpy as np
 
 def plot_mwd(RA,Dec,org=0,title='Mollweide projection', projection='mollweide',filename='Mollweide-Projection'):
     ''' RA, Dec are arrays of the same length.
@@ -10,6 +10,11 @@ def plot_mwd(RA,Dec,org=0,title='Mollweide projection', projection='mollweide',f
     title is the title of the figure.
     projection is the kind of projection: 'mollweide', 'aitoff', 'hammer', 'lambert'
     '''
+    coord = SkyCoord(ra=RA,dec=Dec,unit='deg',frame='icrs')
+    l = coord.galactic.l.deg
+    b = coord.galactic.b.deg
+    RA = l
+    Dec = b
     x = np.remainder(RA+360-org,360) # shift RA values
     ind = x>180
     x[ind] -=360    # scale conversion to [-180, 180]
@@ -22,9 +27,9 @@ def plot_mwd(RA,Dec,org=0,title='Mollweide projection', projection='mollweide',f
     ax.set_xticklabels(tick_labels)     # we add the scale on the x axis
     ax.set_title(title)
     ax.title.set_fontsize(15)
-    ax.set_xlabel("RA")
+    ax.set_xlabel("l")
     ax.xaxis.label.set_fontsize(12)
-    ax.set_ylabel("Dec")
+    ax.set_ylabel("b")
     ax.yaxis.label.set_fontsize(12)
     ax.grid(True)
-    plt.savefig(filename)
+    plt.savefig('out.png')
