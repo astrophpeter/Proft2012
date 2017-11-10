@@ -33,3 +33,33 @@ def plot_mwd(RA,Dec,org=0,title='Mollweide projection', projection='mollweide',f
     ax.yaxis.label.set_fontsize(12)
     ax.grid(True)
     plt.savefig('out.png')
+
+
+def plot_len_traj(lens,sourceRa,sourceDec):
+	"""
+	Creates and saves a plot of the trajectory of
+	of a lens as it goes past closest approah of
+	a source assumed stationary
+
+	Args:
+		lens (lens object) : the lens star
+	
+		sourceRa (double) : Source Right acession
+				    [Degrees]
+		
+		sourceDec (double) : Source Declination 
+				    [Degrees]
+
+	Returns:
+		file (.png) : save in current directoy with
+			      name filename.
+
+	"""
+
+
+
+def get_cut_out(lens, source):
+
+
+
+	
