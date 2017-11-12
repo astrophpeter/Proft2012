@@ -55,8 +55,87 @@ def plot_len_traj(lens,sourceRa,sourceDec):
 			      name filename.
 
 	"""
+def plt_lens_env(lens,sourceRa, sourceDec):
+	"""
+	Creates and saves a plot of the source and lens 
+	environment. Usea DSS sky cut out images. In the 
+	plot the lens blue with trajectory in green. The 
+	source is identified in red. It is assumed source
+	is stationary.
 
+	Ags:
+		lens (lens object): the lens star
 
+		sourceRa (double): Source Right acession
+                                   [Degrees]
+
+		sourceDec (double) : Source Declination
+                                    [Degrees]
+
+	Returns:
+		file (.png) : Output file saved with the id
+			      of the lens.
+	"""
+
+	##### 2MASS ##### - not currently being used - DSS more complete. 
+	filter_2m = 'j' # 2mass filter to use
+
+	metadata_url = 'http://irsa.ipac.caltech.edu/ibe/search/twomass/allsky/allsky?POS={0},{1}'.format(sourceRa[0],sourceDec[0])
+	metadata = ascii.read(metadata_url, Reader=ascii.ipac.Ipac)
+    	
+	# selecting the first obs in the requested filter in case there is more than one
+	target_obs = metadata[metadata['filter']==filter_2m][0]
+    
+	params = { 'ordate': target_obs['ordate'],
+		'hemisphere': target_obs['hemisphere'],
+		'scanno': target_obs['scanno'],
+		'fname': target_obs['fname'],
+		'ra': sourceRa,
+		'de': sourceDec,
+		'imsize': imsize }
+        
+	#DSS Search
+	url = "http://stdatu.stsci.edu/cgi-bin/dss_search?v=poss2ukstu_red&r={ra}&d={de}&e=J2000&h={imsize}&w={imsize}&f=fits".format(**params)
+	hdulist = fits.open(url)
+	
+	#Find the time the image was taken YYYY-MM-DD
+	timeString  = hdulist[0].header['DATE-OBS'][:10]
+
+    	# Get the position of the lens at the time the image was taken
+	time = lens.datetime_to_jyTCB(timeString)
+	coord = lens.get_eq_coords_at_epoch(time)
+    
+	#Get ra and dec of lens at the image time (raCos(dec) is converted into ra)
+	raLensimag = coord[0] / np.cos(np.deg2rad(lensDec[0]))
+	decLensimag = coord[1]
+    
+	# Find the postition of the lens in the future so its trajectory can be plotted
+	timeend = testlens1.datetime_to_jyTCB('2040-01-01')
+	coordend = testlens1.get_eq_coords_at_epoch(timeend)
+    	raLensimagend = coordend[0] / np.cos(np.deg2rad(lensDec[0]))
+	decLensimagend = coordend[1]
+    
+	# Find the line of the lens trajectory between the time when the image was taken to
+	# to some time in the future. 
+	line = np.array([[raLensimag,raLensimagend],[decLensimag,decLensimagend]])
+    
+        # Plot the image, with reverse gray color map.
+	fig = aplpy.FITSFigure(hdulist[0])
+	fig.show_colorscale(cmap='gray_r')
+	
+	#Plot the positions of the source, lens and lens tragectory on the image
+	fig.show_markers(sourceRa,sourceDec,marker='o',edgecolor='r',label='source')
+	fig.show_markers(raLensimag,decLensimag,marker='o',edgecolor='b',label='lens at image time (1989-11-22)')
+	fig.show_lines([line],color='g',linestyle='--',label='lens-trajectory')
+    
+	# Add some extra info about the source and lens to the plot.
+	fig.add_label(0.7,0.98,Diststr,relative=True)
+	fig.add_label(0.7,0.94,Timestr,relative=True)
+	fig.add_label(0.7,0.90,Lensstr,relative=True)
+	fig.add_label(0.7,0.86,Sourcestr,relative=True)
+    
+	filename = 'source_env/TGAS_' + str(lens.getId()) + '.png'
+	fig.save(filename,dpi=200)
 
 def get_cut_out(lens, source):
 
