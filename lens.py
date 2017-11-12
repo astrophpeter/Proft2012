@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import doctest
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
-from scipy.optimize import minimize_scalar
+
 
 class Lens:
 
@@ -291,8 +291,44 @@ class Lens:
 		#return the time of closest approach 
 		return self._epoch_0 + top / bottom 
 
+	def get_dist_of_closest_app(self,source_ra,source_dec):
+		"""
+		Returns the distance of closest apprach in [mas]
+		Assuming the source is stationary. 
+		
+		Args: 
+			source_ra (double) : Barycentric right ascension of source
+                                             [Degrees]
+                                             
+                        source_dec (double) : Barycentric declination of source
+                                             [Degrees] 
+		
+		Returns: distance (double) : Min Angular separation of source and
+                                             lens [mas]
+		"""
+
+		
+		time_closest = self.get_time_closest_app(source_ra,source_dec)
+		return self.get_angular_separation_at_epoch(time_closest)
 
 
+
+	def get_time_closest_app_lens(self, otherlens):
+		"""
+		Returns the time of cloesest approach between a lens
+		and another source where the source (otherlens)
+		which takes into account proper motion.
+		
+		Args:
+			otherlens (lens object) : Source built using another
+						  lens object so pm can be acconted
+						  for 
+		Returns:
+			time (double) : time of closest approach [Julian Years]
+		"""
+		
+
+		
 #doctest.testmod(extraglobs={'testlens':Lens(0,0,0,0,0,0)})
 
 
