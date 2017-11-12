@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 from astropy.coordinates import SkyCoord
 import numpy as np
+import aplpy
+from astropy.wcs import WCS
+from astropy.io import fits, ascii
+from astroquery.skyview import SkyView
 
 def plot_mwd(RA,Dec,org=0,title='Mollweide projection', projection='mollweide',filename='Mollweide-Projection'):
 	''' RA, Dec are arrays of the same length.
@@ -77,10 +81,13 @@ def plt_lens_env(lens, sourceRa, sourceDec, sourceId):
 			      of the lens.
 	"""
 
+	#define cutout image size [arsec]
+	imsize = 2
+
 	##### 2MASS ##### - not currently being used - DSS more complete. 
 	filter_2m = 'j' # 2mass filter to use
 
-	metadata_url = 'http://irsa.ipac.caltech.edu/ibe/search/twomass/allsky/allsky?POS={0},{1}'.format(sourceRa[0],sourceDec[0])
+	metadata_url = 'http://irsa.ipac.caltech.edu/ibe/search/twomass/allsky/allsky?POS={0},{1}'.format(sourceRa,sourceDec)
 	metadata = ascii.read(metadata_url, Reader=ascii.ipac.Ipac)
     	
 	# selecting the first obs in the requested filter in case there is more than one
@@ -106,13 +113,13 @@ def plt_lens_env(lens, sourceRa, sourceDec, sourceId):
 	coord = lens.get_eq_coords_at_epoch(time)
     
 	#Get ra and dec of lens at the image time (raCos(dec) is converted into ra)
-	raLensimag = coord[0] / np.cos(np.deg2rad(lensDec[0]))
+	raLensimag = coord[0] / np.cos(np.deg2rad(lens._dec_0))
 	decLensimag = coord[1]
     
 	# Find the postition of the lens in the future so its trajectory can be plotted
-	timeend = testlens1.datetime_to_jyTCB('2040-01-01')
-	coordend = testlens1.get_eq_coords_at_epoch(timeend)
-	raLensimagend = coordend[0] / np.cos(np.deg2rad(lensDec[0]))
+	timeend = lens.datetime_to_jyTCB('2040-01-01')
+	coordend = lens.get_eq_coords_at_epoch(timeend)
+	raLensimagend = coordend[0] / np.cos(np.deg2rad(lens._dec_0))
 	decLensimagend = coordend[1]
     
 	# Find the line of the lens trajectory between the time when the image was taken to
@@ -130,12 +137,13 @@ def plt_lens_env(lens, sourceRa, sourceDec, sourceId):
 
 	#Find Time and distance of Cloeset approach
 	timeCl = lens.get_time_of_closest_app(sourceRa,sourceDec)
-	testlens1.get_angular_separation_at_epoch(timeCl,sourceRa,sourceDec)
+	distCl = lens.get_angular_separation_at_epoch(timeCl,sourceRa,sourceDec)
 
-	Diststr = 'Distance of closest Approach: ' + str("%.2f" % CloseApp[i]) + ' [mas]'
+        # get some info about the lens system to display on the plot
+	Diststr = 'Distance of closest Approach: ' + str("%.2f" % distCl) + ' [mas]'
 	Timestr = 'Time of closest Approach: ' + str("%.2f" %timeCl) + ' [Jyr]'
 	Lensstr = 'TGAS Lens Id (Blue): ' + str(lens.getId()) 
-	Sourcestr = 'PPMXL Source (Red) Id:' + str(sourceid)
+	Sourcestr = 'PPMXL Source (Red) Id:' + str(sourceId)
 
     
 	# Add some extra info about the source and lens to the plot.
@@ -144,10 +152,10 @@ def plt_lens_env(lens, sourceRa, sourceDec, sourceId):
 	fig.add_label(0.7,0.90,Lensstr,relative=True)
 	fig.add_label(0.7,0.86,Sourcestr,relative=True)
     
-	filename = 'source_env/TGAS_' + str(lens.getId()) + '.png'
+	filename = 'TGAS_' + str(lens.getId()) + '.png'
 	fig.save(filename,dpi=200)
 
-def get_cut_out(lens, source):
+
 
 
 
