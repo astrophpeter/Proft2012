@@ -3,36 +3,36 @@ from astropy.coordinates import SkyCoord
 import numpy as np
 
 def plot_mwd(RA,Dec,org=0,title='Mollweide projection', projection='mollweide',filename='Mollweide-Projection'):
-    ''' RA, Dec are arrays of the same length.
-    RA takes values in [0,360), Dec in [-90,90],
-    which represent angles in degrees.
-    org is the origin of the plot, 0 or a multiple of 30 degrees in [0,360).
-    title is the title of the figure.
-    projection is the kind of projection: 'mollweide', 'aitoff', 'hammer', 'lambert'
-    '''
-    coord = SkyCoord(ra=RA,dec=Dec,unit='deg',frame='icrs')
-    l = coord.galactic.l.deg
-    b = coord.galactic.b.deg
-    RA = l
-    Dec = b
-    x = np.remainder(RA+360-org,360) # shift RA values
-    ind = x>180
-    x[ind] -=360    # scale conversion to [-180, 180]
-    x=-x    # reverse the scale: East to the left
-    tick_labels = np.array([150, 120, 90, 60, 30, 0, 330, 300, 270, 240, 210])
-    tick_labels = np.remainder(tick_labels+360+org,360)
-    fig = plt.figure(figsize=(10, 5))
-    ax = fig.add_subplot(111, projection=projection, axisbg ='white')
-    ax.scatter(np.radians(x),np.radians(Dec))  # convert degrees to radians
-    ax.set_xticklabels(tick_labels)     # we add the scale on the x axis
-    ax.set_title(title)
-    ax.title.set_fontsize(15)
-    ax.set_xlabel("l")
-    ax.xaxis.label.set_fontsize(12)
-    ax.set_ylabel("b")
-    ax.yaxis.label.set_fontsize(12)
-    ax.grid(True)
-    plt.savefig('out.png')
+	''' RA, Dec are arrays of the same length.
+	RA takes values in [0,360), Dec in [-90,90],
+	which represent angles in degrees.
+	org is the origin of the plot, 0 or a multiple of 30 degrees in [0,360).
+	title is the title of the figure.
+	projection is the kind of projection: 'mollweide', 'aitoff', 'hammer', 'lambert'
+	'''
+	coord = SkyCoord(ra=RA,dec=Dec,unit='deg',frame='icrs')
+	l = coord.galactic.l.deg
+	b = coord.galactic.b.deg
+	RA = l	
+	Dec = b
+	x = np.remainder(RA+360-org,360) # shift RA values
+	ind = x>180
+	x[ind] -=360    # scale conversion to [-180, 180]
+	x=-x    # reverse the scale: East to the left
+	tick_labels = np.array([150, 120, 90, 60, 30, 0, 330, 300, 270, 240, 210])
+	tick_labels = np.remainder(tick_labels+360+org,360)
+	fig = plt.figure(figsize=(10, 5))
+	ax = fig.add_subplot(111, projection=projection, axisbg ='white')
+	ax.scatter(np.radians(x),np.radians(Dec))  # convert degrees to radians
+	ax.set_xticklabels(tick_labels)     # we add the scale on the x axis
+	ax.set_title(title)
+	ax.title.set_fontsize(15)
+	ax.set_xlabel("l")
+	ax.xaxis.label.set_fontsize(12)
+	ax.set_ylabel("b")
+	ax.yaxis.label.set_fontsize(12)
+	ax.grid(True)
+	plt.savefig('out.png')
 
 
 def plot_len_traj(lens,sourceRa,sourceDec):
@@ -55,7 +55,7 @@ def plot_len_traj(lens,sourceRa,sourceDec):
 			      name filename.
 
 	"""
-def plt_lens_env(lens,sourceRa, sourceDec):
+def plt_lens_env(lens, sourceRa, sourceDec, sourceId):
 	"""
 	Creates and saves a plot of the source and lens 
 	environment. Usea DSS sky cut out images. In the 
@@ -101,7 +101,7 @@ def plt_lens_env(lens,sourceRa, sourceDec):
 	#Find the time the image was taken YYYY-MM-DD
 	timeString  = hdulist[0].header['DATE-OBS'][:10]
 
-    	# Get the position of the lens at the time the image was taken
+	# Get the position of the lens at the time the image was taken
 	time = lens.datetime_to_jyTCB(timeString)
 	coord = lens.get_eq_coords_at_epoch(time)
     
@@ -112,14 +112,14 @@ def plt_lens_env(lens,sourceRa, sourceDec):
 	# Find the postition of the lens in the future so its trajectory can be plotted
 	timeend = testlens1.datetime_to_jyTCB('2040-01-01')
 	coordend = testlens1.get_eq_coords_at_epoch(timeend)
-    	raLensimagend = coordend[0] / np.cos(np.deg2rad(lensDec[0]))
+	raLensimagend = coordend[0] / np.cos(np.deg2rad(lensDec[0]))
 	decLensimagend = coordend[1]
     
 	# Find the line of the lens trajectory between the time when the image was taken to
 	# to some time in the future. 
 	line = np.array([[raLensimag,raLensimagend],[decLensimag,decLensimagend]])
     
-        # Plot the image, with reverse gray color map.
+	# Plot the image, with reverse gray color map.
 	fig = aplpy.FITSFigure(hdulist[0])
 	fig.show_colorscale(cmap='gray_r')
 	
@@ -127,6 +127,16 @@ def plt_lens_env(lens,sourceRa, sourceDec):
 	fig.show_markers(sourceRa,sourceDec,marker='o',edgecolor='r',label='source')
 	fig.show_markers(raLensimag,decLensimag,marker='o',edgecolor='b',label='lens at image time (1989-11-22)')
 	fig.show_lines([line],color='g',linestyle='--',label='lens-trajectory')
+
+	#Find Time and distance of Cloeset approach
+	timeCl = lens.get_time_of_closest_app(sourceRa,sourceDec)
+	testlens1.get_angular_separation_at_epoch(timeCl,sourceRa,sourceDec)
+
+	Diststr = 'Distance of closest Approach: ' + str("%.2f" % CloseApp[i]) + ' [mas]'
+	Timestr = 'Time of closest Approach: ' + str("%.2f" %timeCl) + ' [Jyr]'
+	Lensstr = 'TGAS Lens Id (Blue): ' + str(lens.getId()) 
+	Sourcestr = 'PPMXL Source (Red) Id:' + str(sourceid)
+
     
 	# Add some extra info about the source and lens to the plot.
 	fig.add_label(0.7,0.98,Diststr,relative=True)
