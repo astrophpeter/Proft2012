@@ -39,7 +39,7 @@ def plot_mwd(RA,Dec,org=0,title='Mollweide projection', projection='mollweide',f
 	plt.savefig('out.png')
 
 
-def plot_len_traj(lens,sourceRa,sourceDec):
+def plt_len_traj(lens,sourceRa,sourceDec):
 	"""
 	Creates and saves a plot of the trajectory of
 	of a lens as it goes past closest approah of
@@ -59,6 +59,49 @@ def plot_len_traj(lens,sourceRa,sourceDec):
 			      name filename.
 
 	"""
+	
+	#filename 
+	lensidstring = 'trject_test' + str(lens.getId()) + '.png'
+
+	#get two point on lens trjectory so line can be drawn 
+	pos1 = lens.get_eq_coords_at_epoch(2009.0)
+	pos2 = lens.get_eq_coords_at_epoch(2025.0)
+        
+	#get the search window for the lens 
+	box = np.transpose(lens.get_lens_box())	
+	
+	#add the first coordinates of search window corners
+	#to the end of the lost for plotting purposes to be 
+	#able to shade search window with matplotlib 
+	boxjX = np.append(box[0],box[0][0])
+	boxjY = np.append(box[1],box[1][0])
+        
+	#find the time and sitance of closest approah of
+	# lens to source
+	timeCl = lens.get_time_of_closest_app(sourceRa,sourceDec)
+	posClose = lens.get_eq_coords_at_epoch(timeCl)
+	
+	# shade background search window
+	plt.fill_between(boxjX,boxjY,alpha=0.3,label='Background source search window')
+	
+	#set plot limints close to edge of search window 
+	plt.xlim(min(box[0]) - 0.0001,max(box[0]) + 0.0001)
+	plt.ylim(min(box[1]) - 0.0001,max(box[1]) + 0.0001)
+	
+	plt.ylabel(r'$\delta$')
+	plt.xlabel(r'$\alpha\cos\delta$')
+        
+	plt.title(r'Lens with $\mu_{\alpha *}$=%.1f and $\mu_{\delta}$=%.1f [mas yr$^{-1}$]'%(lens._pmra,lens._pmdec))
+	plt.scatter(sourceRa*np.cos(np.deg2rad(sourceDec)),sourceDec,label='source')
+	plt.plot([pos1[0],pos2[0]],[pos1[1],pos2[1]],'r--',label='lens trajectory')
+	plt.scatter(posClose[0],posClose[1],label='lens at closest app')
+	
+	plt.legend()	
+	
+	plt.savefig(lensidstring)
+	
+	plt.clf()
+	
 def plt_lens_env(lens, sourceRa, sourceDec, sourceId):
 	"""
 	Creates and saves a plot of the source and lens 
