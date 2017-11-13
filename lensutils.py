@@ -102,7 +102,7 @@ def plt_len_traj(lens,sourceRa,sourceDec):
 	
 	plt.clf()
 	
-def plt_lens_env(lens, sourceRa, sourceDec, sourceId,sourceMag,lensMag):
+def plt_lens_env(lens, sourceRa, sourceDec,lensMag,sourceMag,sourceId):
 	"""
 	Creates and saves a plot of the source and lens 
 	environment. Usea DSS sky cut out images. In the 
@@ -200,7 +200,7 @@ def plt_lens_env(lens, sourceRa, sourceDec, sourceId,sourceMag,lensMag):
 	fig.add_label(0.85,0.74,LensMag,relative=True)
 
 	
-	filename = 'source_env_all/TGAS_' + str(lens.getId()) + '.png'
+	filename = 'good_cand_ppmxl/TGAS_' + str(lens.getId()) + '.png'
 	fig.save(filename,dpi=200)
 
 
