@@ -102,7 +102,7 @@ def plt_len_traj(lens,sourceRa,sourceDec):
 	
 	plt.clf()
 	
-def plt_lens_env(lens, sourceRa, sourceDec, sourceId):
+def plt_lens_env(lens, sourceRa, sourceDec, sourceId,sourceMag,lensMag):
 	"""
 	Creates and saves a plot of the source and lens 
 	environment. Usea DSS sky cut out images. In the 
@@ -187,15 +187,20 @@ def plt_lens_env(lens, sourceRa, sourceDec, sourceId):
 	Timestr = 'Time of closest Approach: ' + str("%.2f" %timeCl) + ' [Jyr]'
 	Lensstr = 'TGAS Lens Id (Blue): ' + str(lens.getId()) 
 	Sourcestr = 'PPMXL Source (Red) Id:' + str(sourceId)
-
+	SourceMag = 'PPMXL source mag [j,h,k,b1,b2,r1,r2]: '
+	LensMag = 'TGAS Lens Gmag: ' + str("%.2f" %lensMag)
     
 	# Add some extra info about the source and lens to the plot.
-	fig.add_label(0.7,0.98,Diststr,relative=True)
-	fig.add_label(0.7,0.94,Timestr,relative=True)
-	fig.add_label(0.7,0.90,Lensstr,relative=True)
-	fig.add_label(0.7,0.86,Sourcestr,relative=True)
-    
-	filename = 'TGAS_' + str(lens.getId()) + '.png'
+	fig.add_label(0.75,0.98,Diststr,relative=True)
+	fig.add_label(0.75,0.94,Timestr,relative=True)
+	fig.add_label(0.75,0.90,Lensstr,relative=True)
+	fig.add_label(0.75,0.86,Sourcestr,relative=True)
+	fig.add_label(0.80,0.82,SourceMag,relative=True)
+	fig.add_label(0.70,0.78,str(sourceMag),relative=True)
+	fig.add_label(0.85,0.74,LensMag,relative=True)
+
+	
+	filename = 'source_env/TGAS_' + str(lens.getId()) + '.png'
 	fig.save(filename,dpi=200)
 
 

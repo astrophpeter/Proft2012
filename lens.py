@@ -313,21 +313,50 @@ class Lens:
 
 
 
-	def get_time_closest_app_lens(self, otherlens):
-		"""
-		Returns the time of cloesest approach between a lens
-		and another source where the source (otherlens)
-		which takes into account proper motion.
-		
-		Args:
-			otherlens (lens object) : Source built using another
-						  lens object so pm can be acconted
-						  for 
-		Returns:
-			time (double) : time of closest approach [Julian Years]
-		"""
-		
+	#def get_time_closest_app_lens(self, otherlens):
+	#	"""
+	#	Returns the time of cloesest approach between a lens
+        #		and another source where the source (otherlens)
+#		which takes into account proper motion.
+#		
+#		Args:
+#			otherlens (lens object) : Source built using another
+#						  lens object so pm can be acconted
+#						  for 
+#		Returns:
+#			time (double) : time of closest approach [Julian Years]
+#		"""
+#		
+#				
+#		#convert \mu_{\apha *} from [mas/yr] to [deg/yr]
+#                #note this term already includes the cos(dec)
+#                pmRaDegSelf = self._pmra * self.mas_to_deg
+#
+#                #convert \mu_{\dec} from [mas/yr] to [deg/yr]
+#                pmDecDegSelf = self._pmdec * self.mas_to_deg
+#
+#                
+#		#convert \mu_{\apha *} from [mas/yr] to [deg/yr]
+#                #note this term already includes the cos(dec)
+#                pmRaDegOther = otherlens._pmra * self.mas_to_deg
+#
+#                #convert \mu_{\dec} from [mas/yr] to [deg/yr]
+#                pmDecDegOther = otherlens._pmdec * self.mas_to_deg
+#
+#
+#		#pre compute some frequently used quantities
+#                cosOtherDec = np.cos(np.deg2rad(otherlens._dec_0))
+#                cosSelfDec = np.cos(np.deg2rad(self._dec_0))
+#
+#		#find the postion of the other lens at the refernce epoch of
+#		# this lens.
+#
+#		coord = otherlens.get_eq_coord_at_epoch(self._epoch_0)
+#		
+#
+#		top = - (((pmDecDeg) * (self._dec_0 - source_dec)) + (pmRaDeg) * ((self._ra_0 * cosLensDec) - (source_ra * cosSourceDec)))
 
+                
 		
 #doctest.testmod(extraglobs={'testlens':Lens(0,0,0,0,0,0)})
 
