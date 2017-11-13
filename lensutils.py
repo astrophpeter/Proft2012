@@ -200,7 +200,7 @@ def plt_lens_env(lens, sourceRa, sourceDec, sourceId,sourceMag,lensMag):
 	fig.add_label(0.85,0.74,LensMag,relative=True)
 
 	
-	filename = 'source_env/TGAS_' + str(lens.getId()) + '.png'
+	filename = 'source_env_all/TGAS_' + str(lens.getId()) + '.png'
 	fig.save(filename,dpi=200)
 
 
