@@ -5,6 +5,7 @@ import aplpy
 from astropy.wcs import WCS
 from astropy.io import fits, ascii
 from astroquery.skyview import SkyView
+import sqlutil as sqlutil 
 
 def plot_mwd(RA,Dec,org=0,title='Mollweide projection', projection='mollweide',filename='Mollweide-Projection'):
 	''' RA, Dec are arrays of the same length.
@@ -178,6 +179,11 @@ def plt_lens_env(lens, sourceRa, sourceDec,lensMag,sourceMag,sourceId):
 	fig.show_markers(raLensimag,decLensimag,marker='o',edgecolor='b',label='lens at image time (1989-11-22)')
 	fig.show_lines([line],color='g',linestyle='--',label='lens-trajectory')
 
+	#PLot gaia source positions also in the image
+	pos = get_gaia_source_pos(sourceRa,sourceDec,2)
+	fig.show_markers(pos[0],pos[1],marker='v',edgecolor='magenta',label='Gaia source')
+
+
 	#Find Time and distance of Cloeset approach
 	timeCl = lens.get_time_of_closest_app(sourceRa,sourceDec)
 	distCl = lens.get_angular_separation_at_epoch(timeCl,sourceRa,sourceDec)
@@ -204,7 +210,36 @@ def plt_lens_env(lens, sourceRa, sourceDec,lensMag,sourceMag,sourceId):
 	fig.save(filename,dpi=200)
 
 
+def get_gaia_source_pos(centerRa,centerDec,size):
+	"""
+	Get all the gaia source positions are epoch 2015.0
+	in a search radius of size.
+
+
+	Args: 
+		centerRA (double) : Right acession of the center of 
+				    the search radius [Degrees] 
+		
+		centerDec (souble) : Declination of the center of the 
+			             the search radius [Degrees]
+
+		size (double) : size of the search radius [arminutes]
+
+	Returns: 
+		pos (np.array(double)) : Position of gaia sources [
+					[Ra,dec],[Ra,dec]..]
+
+
+	"""
+
+
+	query = 'select ra,dec from gaia_dr1.gaia_source where ra BETWEEN ' + str(centerRa) + ' - 0.016 and ' + str(centerRa)  + '+ 0.016 AND dec BETWEEN ' + str(centerDec)  + '- 0.016 and ' + str(centerDec) + '+ 0.016'
+
+	ra, dec = sqlutil.get(query,db='wsdb',host='cappc127.ast.cam.ac.uk', user='peter_mcgill', password='Ln3g.wsk')
+
+	 
+	return [ra,dec]
 
 
 
-	
+
