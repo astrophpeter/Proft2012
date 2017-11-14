@@ -165,6 +165,11 @@ def plt_lens_env(lens, sourceRa, sourceDec,lensMag,sourceMag,sourceId):
 	coordend = lens.get_eq_coords_at_epoch(timeend)
 	raLensimagend = coordend[0] / np.cos(np.deg2rad(lens._dec_0))
 	decLensimagend = coordend[1]
+	
+	# Find the postition of the lens at gaia epoch 2015.0
+	coordGaiaEpoch = lens.get_eq_coords_at_epoch(2015.0)
+	raLensimagGaiaEpoch = coordGaiaEpoch[0] / np.cos(np.deg2rad(lens._dec_0))
+	decLensimagGaiaEpoch = coordGaiaEpoch[1]
     
 	# Find the line of the lens trajectory between the time when the image was taken to
 	# to some time in the future. 
@@ -183,6 +188,8 @@ def plt_lens_env(lens, sourceRa, sourceDec,lensMag,sourceMag,sourceId):
 	pos = get_gaia_source_pos(sourceRa,sourceDec,2)
 	fig.show_markers(pos[0],pos[1],marker='v',edgecolor='magenta',label='Gaia source')
 
+	#Plot lens at gaia epoch on the image
+	fig.show_markers(raLensimagGaiaEpoch,decLensimagGaiaEpoch,marker='>',edgecolor='b')
 
 	#Find Time and distance of Cloeset approach
 	timeCl = lens.get_time_of_closest_app(sourceRa,sourceDec)
@@ -227,7 +234,7 @@ def get_gaia_source_pos(centerRa,centerDec,size):
 
 	Returns: 
 		pos (np.array(double)) : Position of gaia sources [
-					[Ra,dec],[Ra,dec]..]
+					[Ra,Ra],[dec,dec]..]
 
 
 	"""
@@ -240,6 +247,4 @@ def get_gaia_source_pos(centerRa,centerDec,size):
 	 
 	return [ra,dec]
 
-
-
-
+#def calc_centroid_shift(
