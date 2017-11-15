@@ -247,4 +247,37 @@ def get_gaia_source_pos(centerRa,centerDec,size):
 	 
 	return [ra,dec]
 
-#def calc_centroid_shift(
+def calc_centroid_shift(lensMass,lensDist,impactAngle):
+	"""
+	calculates the centriod shit of the lens
+	from the lens mass and distance
+
+	Args:
+		lensMass (double) : mass of the lens
+			            [Msol]
+
+		lensDist (double) : Distance to the lens
+					[parces]
+		
+		impactAngle (double) : Angular distance of closest	
+					approch between lens and 
+					source [mas]
+
+	Return: 
+		Centriod shift (double) : Shift of the centriod
+					   [mas]
+	"""
+	#speed of light in units [cm/s]
+	c = 2.99 * (10 ** 10)
+	
+	#G in units of [cm^3/gs^2]
+	G = 6.672 + * (10 **(-8))
+ 
+	#Calculate Enstien Radius
+	enstienR = np.sqrt((4 * G * lensMass) / ((c**2) * lensDist))
+
+	#calculate mu
+	mu = impactAngle / enstienR
+
+	return (mu * enstienR) / ((mu**2) + 2)
+	
