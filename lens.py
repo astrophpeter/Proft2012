@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import doctest
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
-
+import math
 
 class Lens:
 
@@ -18,7 +18,7 @@ class Lens:
 	min_angular_width = 0.7  
 
 	#mas to degree conversion
-	mas_to_deg = (1.0 / 3600)*10**(-3)
+	mas_to_deg = 0.0000002777777777777777777777
 
 	def __init__ (self,id,ra_0,dec_0,pmra,pmdec,epoch_0,scale_in='tcb',format_in='jyear'):
 		"""
@@ -46,6 +46,7 @@ class Lens:
 
 			epoch_0 (double) : Reference epoch in Julian year 
                                            with Barycentric coordinate time (TCB)
+
 		"""
 		#set all properties for lens
 		self._id = id
@@ -68,6 +69,10 @@ class Lens:
 		Returns:
 			id (long) : source id from source_id
 			column in GAIA TGAS Table.
+		
+		Units Tests:
+		>>> unittestinglens.getId()
+		123456789
 		"""
 		
 		return self._id
@@ -87,7 +92,14 @@ class Lens:
 		Reuturns:
 			Eq_coord (array(double)) : Equatorial 
 					coordinates [ra*cos(dec),dec]
-
+		
+		Unit Tests:
+		>>> math.isclose(unittestinglens.get_eq_coords(30.0,60.0)[0],15.0)
+		True
+	
+		>>> math.isclose(unittestinglens.get_eq_coords(30.0,60.0)[1],60.0)
+                True
+		
 		"""	
 		return [ra* np.cos(np.deg2rad(dec)),dec]
         
@@ -106,6 +118,18 @@ class Lens:
 			Eq_coord (array(double)) : Coordinates of the lens
 						   at time = epoch in the form
 						   [ra*cos(dec),dec][degrees]
+		Unit Tests:
+		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(2025.0)[0],15.000444444)
+		True
+
+		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(2025.0)[1],60.000444444)
+                True
+
+		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(1956.0)[0],14.99852778)
+		True
+
+		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(1956.0)[1],59.99852779)
+		True
 
 		"""
 		
@@ -134,14 +158,20 @@ class Lens:
 		Returns:
 
 			julianYear (double) : the date in julian years
+		
+		Units Tests:
+		#>>> math.isclose(unittestinglens.datetime_to_jyTCB('2009-01-01 00:00:00'),2009.0)
+		True
 
+		#>>> math.isclose(unittestinglens.datetime_to_jyTCB('2016-07-02'),2016.5)
+		True
 		"""
 		
 		time = Time(date,scale='tcb')
 		time.format = 'jyear'
 		
 		return time.value
-                
+	                
 	def get_GAIA_start_end_coords(self):
 		"""
 		Returns the position of the lens at the start and end times of the 
@@ -358,7 +388,7 @@ class Lens:
 
                 
 		
-#doctest.testmod(extraglobs={'testlens':Lens(0,0,0,0,0,0)})
+doctest.testmod(extraglobs={'unittestinglens':Lens(123456789,30.0,60.0,100.0,100.0,2009.0)})
 
 
 
