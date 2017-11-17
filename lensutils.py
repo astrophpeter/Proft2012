@@ -129,21 +129,23 @@ def plt_lens_env(lens, sourceRa, sourceDec,lensMag,sourceMag,sourceId):
 	imsize = 2
 
 	##### 2MASS ##### - not currently being used - DSS more complete. 
-	filter_2m = 'j' # 2mass filter to use
+	#filter_2m = 'j' # 2mass filter to use
 
-	metadata_url = 'http://irsa.ipac.caltech.edu/ibe/search/twomass/allsky/allsky?POS={0},{1}'.format(sourceRa,sourceDec)
-	metadata = ascii.read(metadata_url, Reader=ascii.ipac.Ipac)
+	#metadata_url = 'http://irsa.ipac.caltech.edu/ibe/search/twomass/allsky/allsky?POS={0},{1}'.format(sourceRa,sourceDec)
+	#metadata = ascii.read(metadata_url, Reader=ascii.ipac.Ipac)
     	
 	# selecting the first obs in the requested filter in case there is more than one
-	target_obs = metadata[metadata['filter']==filter_2m][0]
+	#target_obs = metadata[metadata['filter']==filter_2m][0]
     
-	params = { 'ordate': target_obs['ordate'],
-		'hemisphere': target_obs['hemisphere'],
-		'scanno': target_obs['scanno'],
-		'fname': target_obs['fname'],
-		'ra': sourceRa,
-		'de': sourceDec,
-		'imsize': imsize }
+	#params = { 'ordate': target_obs['ordate'],
+	#	'hemisphere': target_obs['hemisphere'],
+	#	'scanno': target_obs['scanno'],
+	#	'fname': target_obs['fname'],
+	#	'ra': sourceRa,
+	#	'de': sourceDec,
+	#	'imsize': imsize }
+
+	params = {'ra': sourceRa,'de': sourceDec,'imsize': imsize }
         
 	#DSS Search
 	url = "http://stdatu.stsci.edu/cgi-bin/dss_search?v=poss2ukstu_red&r={ra}&d={de}&e=J2000&h={imsize}&w={imsize}&f=fits".format(**params)
@@ -213,7 +215,7 @@ def plt_lens_env(lens, sourceRa, sourceDec,lensMag,sourceMag,sourceId):
 	fig.add_label(0.85,0.74,LensMag,relative=True)
 
 	
-	filename = 'good_cand_ppmxl/TGAS_' + str(lens.getId()) + '.png'
+	filename = 'GaiasourceMatchfuture/TGAS_' + str(lens.getId()) + '.png'
 	fig.save(filename,dpi=200)
 
 
@@ -271,7 +273,7 @@ def calc_centroid_shift(lensMass,lensDist,impactAngle):
 	c = 2.99 * (10 ** 10)
 	
 	#G in units of [cm^3/gs^2]
-	G = 6.672 + * (10 **(-8))
+	G = 6.672 * (10 **(-8))
  
 	#Calculate Enstien Radius
 	enstienR = np.sqrt((4 * G * lensMass) / ((c**2) * lensDist))

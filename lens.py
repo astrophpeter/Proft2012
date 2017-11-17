@@ -18,7 +18,7 @@ class Lens:
 	min_angular_width = 0.7  
 
 	#mas to degree conversion
-	mas_to_deg = 0.0000002777777777777777777777
+	mas_to_deg = 0.0000002777777
 
 	def __init__ (self,id,ra_0,dec_0,pmra,pmdec,epoch_0,scale_in='tcb',format_in='jyear'):
 		"""
@@ -131,6 +131,11 @@ class Lens:
 		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(1956.0)[1],59.99852779)
 		True
 
+		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(2017.0)[0],15.00022222)
+		True
+
+		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(2017.0)[1],60.00022222)
+                True
 		"""
 		
 		
@@ -245,6 +250,13 @@ class Lens:
 		Returns:
 			inBox (bool) : Return true if source is in
 				       len's search box, false otherwise.
+		
+		Unit Tests:
+		>>> unittestinglens.is_coord_in_box(30.00069760,60.00024)
+		True
+		>>> unittestinglens.is_coord_in_box(30.00069760,60.00124)
+                False
+
 		"""
 
 		point = Point(ra*np.cos(np.deg2rad(dec)),dec)
@@ -274,8 +286,17 @@ class Lens:
 
 		Returns:
 
-			angular_sep (double) : Angular separation of source and 
-					       lens at time = epoch [mas]
+			angular_sep (double) : Angular separation of source and 	
+				     		lens at time = epoch [mas]
+
+		Units Tests:
+		testing this the usual way is tricky as mas is so precise, I think 1 d.p of mas
+		precision is fine here 
+		>>> math.isclose(np.round(unittestinglens.get_angular_separation_at_epoch(2017.0,30.00069760,60.00024),1),90.4)
+		True
+		
+		
+		
 		"""
 		cosSourceDec = np.cos(np.deg2rad(source_dec))	
 		coords = self.get_eq_coords_at_epoch(epoch)
@@ -299,7 +320,10 @@ class Lens:
 		Returns:
 	
 			time (double) : time of closest approach [Julian Years]
-
+		Unit Tests:
+		>>> math.isclose(np.round(unittestinglens.get_time_of_closest_app(30.00069760,60.00024),2),2017.64)
+		True
+	
 		"""
 		
 		#convert \mu_{\apha *} from [mas/yr] to [deg/yr]  		
