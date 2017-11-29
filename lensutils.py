@@ -6,6 +6,9 @@ from astropy.wcs import WCS
 from astropy.io import fits, ascii
 from astroquery.skyview import SkyView
 import sqlutil as sqlutil 
+import doctest
+import math
+
 
 def plot_mwd(RA,Dec,org=0,title='Mollweide projection', projection='mollweide',filename='Mollweide-Projection'):
 	''' RA, Dec are arrays of the same length.
@@ -150,6 +153,8 @@ def plt_lens_env(lens, sourceRa, sourceDec,lensMag,sourceMag,sourceId):
 	#DSS Search
 	url = "http://stdatu.stsci.edu/cgi-bin/dss_search?v=poss2ukstu_red&r={ra}&d={de}&e=J2000&h={imsize}&w={imsize}&f=fits".format(**params)
 	hdulist = fits.open(url)
+
+	print(url) 
 	
 	#Find the time the image was taken YYYY-MM-DD
 	timeString  = hdulist[0].header['DATE-OBS'][:10]
@@ -267,7 +272,12 @@ def calc_centroid_shift(lensMass,lensDist,impactAngle):
 
 	Return: 
 		Centriod shift (double) : Shift of the centriod
+
 					   [mas]
+	Unit Tests:
+	>>> calc_centroid_shift(0.5,120.0,241)
+	0.15
+	
 	"""
 	#speed of light in units [cm/s]
 	c = 2.99 * (10 ** 10)
@@ -276,10 +286,96 @@ def calc_centroid_shift(lensMass,lensDist,impactAngle):
 	G = 6.672 * (10 **(-8))
  
 	#Calculate Enstien Radius
-	enstienR = np.sqrt((4 * G * lensMass) / ((c**2) * lensDist))
-
+	enstienR = 90.0 * np.sqrt((lensMass) / (lensDist))
+		
+	print(enstienR)
+	
 	#calculate mu
 	mu = impactAngle / enstienR
+	
+	print(mu)
 
 	return (mu * enstienR) / ((mu**2) + 2)
+
+
+def get_closes_gaia_source_match(centerRa,centerDec,size):
+        """
+        Get all the gaia source information for all gaia sources
+	within a small search radius. And have low proper motions
+	 
+
+
+        Args:
+                centerRA (double) : Right acession of the center of
+                                    the search radius [Degrees]
+
+                centerDec (souble) : Declination of the center of the
+                                     the search radius [Degrees]
+
+                size (double) : size of the search radius [arminutes]
+
+        Returns:
+                pos (np.array(double)) : Position of gaia sources [
+                                        [[id, id,..],[Ra,Ra],[dec,dec],[gmag,gmag...]..]
+
+
+        """
+
+
+        query = 'select ra,dec, source_id, phot_g_mag_mean from gaia_dr1.gaia_source where ra BETWEEN ' + str(centerRa) + ' - 0.026 and ' + str(centerRa)  + '+ 0.026 AND dec BETWEEN ' + str(centerDec)  + '- 0.026 and ' + str(centerDec) + '+ 0.026 AND hypot(pmra,pmdec) < 50.0'
+
+        ra, dec, id, gmag = sqlutil.get(query,db='wsdb',host='cappc127.ast.cam.ac.uk', user='peter_mcgill', password='Ln3g.wsk')
+
+
+        return [ra,dec,id,gmag]	
+
+def lens_on_color_mag(TGASid,filename):
+	"""
+	Plots the lens with TGASid on a color magnitude diagram
+	with the rest of the TGAS sources - uses 2mass [j-k] colour
+	and absolute G magnitude, saves the plot with file name.
+
+	Args:
+		TGASid (long) : indentified for lens id 
+				in TGAS source_id column
+
+		filename (string) : output file name	
+
+	Returns:
+
+		file (.png) : output file of the plot with
+			      filename.
+
+	"""
+
+	#Get color mag info for lens
+	querystringLens = 'select j_m,k_m,parallax,phot_g_mean_mag from gaia_dr1_aux.gaia_source_2mass_xm where source_id=' + str(TGASid)
+	JmagLens,kMagLens,parallaxLens,gMagLens = sqlutil.get(querystringLens,db='wsdb',host='cappc127.ast.cam.ac.uk', user='peter_mcgill', password='Ln3g.wsk')
+
+	#Calculate colour and absolute mag for lens 
+	absMagLens = gMagLens + 5 * (np.log10(parallaxLens / 1000.0) + 1)
+	colorLens = JmagLens - kMagLens
+
+
+	#Get colour mag for 10000 source form tgas
+	querystring2mass= 'select j_m,k_m,parallax,phot_g_mean_mag from gaia_dr1_aux.gaia_source_2mass_xm where parallax > 0.0001 and j_m > 0.0001 and k_m > 0.0001 limit 100000'
+	Jmag,kMag,parallax,gMag = sqlutil.get(querystring2mass,db='wsdb',host='cappc127.ast.cam.ac.uk', user='peter_mcgill', password='Ln3g.wsk')
+
+
+	#Calculate colour and absolute mags
+	color = Jmag-kMag
+	absmag = gMag + 5 * (np.log10(parallax / 1000.0) + 1)
+
+	#plot 2dhist with scatter of lens overlaid
+	plt.hist2d(color,absmag,bins=300,range=[[-0.1,1.25],[-2,13.5]],cmap='plasma')
+	plt.scatter([colorLens],[absMagLens],color='white',label='TGAS Lens')
+	plt.gca().invert_yaxis()
+	plt.xlabel(r'J-K [2MASS]')
+	plt.ylabel('Absolute G [mag]')
+	plt.legend()
+	plt.savefig(filename,dpi=200)
+	plt.clf()
 	
+	
+
+doctest.testmod()

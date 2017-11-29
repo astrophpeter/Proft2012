@@ -362,9 +362,89 @@ class Lens:
 		"""
 
 		
-		time_closest = self.get_time_closest_app(source_ra,source_dec)
+		time_closest = self.get_time_of_closest_app(source_ra,source_dec)
 		return self.get_angular_separation_at_epoch(time_closest)
 
+	def get_time_closest_app_sourcepm(self,source_ra,source_dec,source_pmra,source_pmdec):
+		"""
+		Calculates the time of closest approach of
+		a source and takes into account the proper
+		motion of the source.
+
+		Args: 
+			lens1 (lens object) : the lens 
+		
+			source_ra (double) : Right acension of the
+			             source [Degress] at 2015.0
+
+			source_dec (double) : Declination of the 
+				     source [Degrees] at 2015.0
+
+			source_epoch (double) : Reference epoch of 
+					the source [Julian Yrs]
+
+			source_pmra (double) ; Proper motion in ra
+					of source [mas/yr]
+
+			source_pmdec (double) : Proper motion in dec
+					of source [mas/yr]
+
+		Returns:
+			time (double) : time of closest approach 
+					[Julian yrs]
+
+
+		"""
+		#convert \mu_{\apha *} from [mas/yr] to [deg/yr]
+        	#note this term already includes the cos(dec)
+		LpmRaDeg = self._pmra * self.mas_to_deg
+		SpmRaDeg = source_pmra * self.mas_to_deg
+
+		#convert \mu_{\dec} from [mas/yr] to [deg/yr]
+		LpmDecDeg = self._pmdec * self.mas_to_deg
+		SpmDecDeg = source_pmdec * self.mas_to_deg
+
+		#pre compute some frequently used quantities
+		cosSourceDec = np.cos(np.deg2rad(source_dec))
+		cosLensDec = np.cos(np.deg2rad(self._dec_0))
+
+		top = - (((LpmDecDeg-SpmDecDeg) * (self._dec_0 - source_dec)) + (LpmRaDeg-SpmRaDeg) * ((self._ra_0 * cosLensDec) - (source_ra * cosSourceDec)))
+		bottom = (LpmDecDeg-SpmDecDeg)**2 + (LpmRaDeg-SpmRaDeg)**2
+
+		return 2015.0 + (top / bottom)
+
+	def get_dist_closest_app_sourcepm(self,source_ra,source_dec,source_pmra,source_pmdec):
+		"""
+		Args:
+                	lens1 (lens object) : the lens
+
+                	source_ra (double) : Right acension of the
+                                     source [Degress] at 2015.0
+
+                	source_dec (double) : Declination of the
+                                     source [Degrees] at 2015.0
+
+
+                	source_pmra (double) ; Proper motion in ra
+                                        of source [mas/yr]
+
+                	source_pmdec (double) : Proper motion in dec
+                                        of source [mas/yr]
+
+        	Returns:
+                	distance (double) : distance of closest approach
+                        	        [Julian yrs]
+
+		"""	
+
+		time = self.get_time_closest_app_sourcepm(source_ra,source_dec,source_pmra,source_pmdec)
+		Lcoords = self.get_eq_coords_at_epoch(time)
+	
+		#compute the source position at time of closest approach
+		SraCosDec = (source_ra*np.cos(np.deg2rad(source_dec))) + (time - 2015.0)* source_pmra * self.mas_to_deg  
+		Sdec = source_dec + (time - 2015.0) * source_pmdec * self.mas_to_deg
+	
+		return np.sqrt((Sdec-Lcoords[1])**2+(SraCosDec - Lcoords[0])**2) / self.mas_to_deg
 
 
 	#def get_time_closest_app_lens(self, otherlens):
@@ -409,7 +489,8 @@ class Lens:
 #		
 #
 #		top = - (((pmDecDeg) * (self._dec_0 - source_dec)) + (pmRaDeg) * ((self._ra_0 * cosLensDec) - (source_ra * cosSourceDec)))
-
+	
+	
                 
 		
 doctest.testmod(extraglobs={'unittestinglens':Lens(123456789,30.0,60.0,100.0,100.0,2009.0)})
