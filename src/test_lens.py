@@ -1,3 +1,4 @@
+import sys
 from lens import Lens
 import unittest
 
@@ -44,6 +45,9 @@ class TestLens(unittest.TestCase):
 	
 		
 if __name__ == '__main__':
-	suite = unittest.TestLoader().loadTestsFromTestCase(TestLens)
-	unittest.TextTestRunner(verbosity=2).run(suite)
+	unittest.main()
+	#suite = unittest.TestLoader().loadTestsFromTestCase(TestLens)
+	#unittest.TextTestRunner(verbosity=2).run(suite)
+	#ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
+	#sys.exit(ret)
 
