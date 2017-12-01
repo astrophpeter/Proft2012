@@ -1,6 +1,6 @@
 from astropy.time import Time
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 #import doctest
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
