@@ -2,7 +2,6 @@ language: python
 install:
  - pip install astropy
  - pip install shapely
- - pip install doctest
 script: src/test_lens.py
 
  
