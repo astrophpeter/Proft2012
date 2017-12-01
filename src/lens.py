@@ -23,30 +23,23 @@ class Lens:
 	def __init__ (self,id,ra_0,dec_0,pmra,pmdec,epoch_0,scale_in='tcb',format_in='jyear'):
 		"""
 		lens object constructor
-
 		Args:
 			id (long): Lens id as specified by the
 		                         'source_id' column in Gaia
 					 TGAS catalogue
-
 			ra_0 (double): Barycentric right ascension 
                                        of the source in ICRS at the
                                        reference epoch Angle [degrees]
-
 			dec_0 (double): Barycentric declination of 
                                         the source in ICRS at the 
                                         reference epoch Angle [degress]  
 		
-
                         pmra (double): Proper motion in right ascension 
                                        direction Angular Velocity[mas/year]
-
                         pmdec (double): Proper motion in declination 
                                         direction Angular Velocity[mas/year]
-
 			epoch_0 (double) : Reference epoch in Julian year 
                                            with Barycentric coordinate time (TCB)
-
 		"""
 		#set all properties for lens
 		self._id = id
@@ -85,10 +78,8 @@ class Lens:
 		Args: 
 			ra (double) : Barycentric right ascension
 				      [Degrees]
-
 			dec (double): Barycentric declination
 				      [Degrees]
-
 		Reuturns:
 			Eq_coord (array(double)) : Equatorial 
 					coordinates [ra*cos(dec),dec]
@@ -108,12 +99,10 @@ class Lens:
 		"""
 		Returns the equtorial coordinates of the lens
 		and the time epoch.
-
 		Args:
 			epoch (double) : Time at which to get coordinates
 					 Julian year with Barycentric 
                                          coordinate time (TCB)
-
 		Reutrns:
 			Eq_coord (array(double)) : Coordinates of the lens
 						   at time = epoch in the form
@@ -121,19 +110,14 @@ class Lens:
 		Unit Tests:
 		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(2025.0)[0],15.000444444)
 		True
-
 		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(2025.0)[1],60.000444444)
                 True
-
 		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(1956.0)[0],14.99852778)
 		True
-
 		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(1956.0)[1],59.99852779)
 		True
-
 		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(2017.0)[0],15.00022222)
 		True
-
 		>>> math.isclose(unittestinglens.get_eq_coords_at_epoch(2017.0)[1],60.00022222)
                 True
 		"""
@@ -156,18 +140,14 @@ class Lens:
 		"""
 		Returns the value of a time in Julian years from a date string
 		of the format 'YYYY-MM-DD' scaled in (TCB)
-
 		Args: 
 			date (string) : string format of the date 'YYYY-MM-DD'
-
 		Returns:
-
 			julianYear (double) : the date in julian years
 		
 		Units Tests:
 		#>>> math.isclose(unittestinglens.datetime_to_jyTCB('2009-01-01 00:00:00'),2009.0)
 		True
-
 		#>>> math.isclose(unittestinglens.datetime_to_jyTCB('2016-07-02'),2016.5)
 		True
 		"""
@@ -181,9 +161,7 @@ class Lens:
 		"""
 		Returns the position of the lens at the start and end times of the 
 		GAIA missin defined by the class constants GAIA_START GAIA_END
-
 		Returns:
-
 			coords (array(double)) : Cordinates of the lens at the
 						 start and end of the gaia mission
 						[[start],[end]] -
@@ -202,14 +180,11 @@ class Lens:
 		min_angular_width and with length of the GAIA Mission.
 		This used as a search window for other catalogues to
 		find sources the lens passes close to.
-
 		Returns:
-
 			box (array(double)) : Four corners of the search
 					      window box [[x1,y1],[x2,y2],
 					      [x3,y3],[x4,y4]] with format	
 					      [ra*cos(dec),dec][degrees]   
-
 		"""
 
 		start_end = self.get_GAIA_start_end_coords()
@@ -239,14 +214,11 @@ class Lens:
 		"""
 		Checks if a source with coordinates
 		ra, dec is in the search window for the lens.
-
 		Args:
 			ra (double) : Barycentric right ascension
                                       of a source [Degrees]
-
 			dec (double) :Barycentric declination
                                       of a source [Degrees]
-
 		Returns:
 			inBox (bool) : Return true if source is in
 				       len's search box, false otherwise.
@@ -256,7 +228,6 @@ class Lens:
 		True
 		>>> unittestinglens.is_coord_in_box(30.00069760,60.00124)
                 False
-
 		"""
 
 		point = Point(ra*np.cos(np.deg2rad(dec)),dec)
@@ -272,7 +243,6 @@ class Lens:
 		at time epoch assuming the source does not move.
 		Implemented using the distance formula in (2.1) in
 		Candidate Lensing Events for Gaia - doc.
-
 		Args: 
 			epoch (double):  Time at which to find separation epoch 
 					 in Julian year with Barycentric 
@@ -280,15 +250,11 @@ class Lens:
 			
 			source_ra (double) : Barycentric right ascension of source
                                              [Degrees] 
-
 			source_dec (double) : Barycentric declination of source
                                              [Degrees]
-
 		Returns:
-
 			angular_sep (double) : Angular separation of source and 	
 				     		lens at time = epoch [mas]
-
 		Units Tests:
 		testing this the usual way is tricky as mas is so precise, I think 1 d.p of mas
 		precision is fine here 
@@ -313,10 +279,8 @@ class Lens:
 		Args:
 			source_ra (double) : Barycentric right ascension of source
                                              [Degrees]
-
                         source_dec (double) : Barycentric declination of source
                                              [Degrees]
-
 		Returns:
 	
 			time (double) : time of closest approach [Julian Years]
@@ -370,30 +334,22 @@ class Lens:
 		Calculates the time of closest approach of
 		a source and takes into account the proper
 		motion of the source.
-
 		Args: 
 			lens1 (lens object) : the lens 
 		
 			source_ra (double) : Right acension of the
 			             source [Degress] at 2015.0
-
 			source_dec (double) : Declination of the 
 				     source [Degrees] at 2015.0
-
 			source_epoch (double) : Reference epoch of 
 					the source [Julian Yrs]
-
 			source_pmra (double) ; Proper motion in ra
 					of source [mas/yr]
-
 			source_pmdec (double) : Proper motion in dec
 					of source [mas/yr]
-
 		Returns:
 			time (double) : time of closest approach 
 					[Julian yrs]
-
-
 		"""
 		#convert \mu_{\apha *} from [mas/yr] to [deg/yr]
         	#note this term already includes the cos(dec)
@@ -417,24 +373,17 @@ class Lens:
 		"""
 		Args:
                 	lens1 (lens object) : the lens
-
                 	source_ra (double) : Right acension of the
                                      source [Degress] at 2015.0
-
                 	source_dec (double) : Declination of the
                                      source [Degrees] at 2015.0
-
-
                 	source_pmra (double) ; Proper motion in ra
                                         of source [mas/yr]
-
                 	source_pmdec (double) : Proper motion in dec
                                         of source [mas/yr]
-
         	Returns:
                 	distance (double) : distance of closest approach
                         	        [Julian yrs]
-
 		"""	
 
 		time = self.get_time_closest_app_sourcepm(source_ra,source_dec,source_pmra,source_pmdec)
@@ -494,6 +443,4 @@ class Lens:
                 
 		
 doctest.testmod(extraglobs={'unittestinglens':Lens(123456789,30.0,60.0,100.0,100.0,2009.0)})
-
-
 
