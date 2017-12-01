@@ -1,7 +1,7 @@
 from astropy.time import Time
 import numpy as np
 import matplotlib.pyplot as plt
-import doctest
+#import doctest
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 import math
@@ -442,5 +442,5 @@ class Lens:
 	
                 
 		
-doctest.testmod(extraglobs={'unittestinglens':Lens(123456789,30.0,60.0,100.0,100.0,2009.0)})
+#doctest.testmod(extraglobs={'unittestinglens':Lens(123456789,30.0,60.0,100.0,100.0,2009.0)})
 
