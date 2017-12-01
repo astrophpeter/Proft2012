@@ -2,6 +2,6 @@ language: python
 install:
  - pip install astropy
  - pip install shapely
-script: src/test_lens.py
+script: python src/test_lens.py
 
  
