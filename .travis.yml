@@ -1,0 +1,5 @@
+language: python
+install:
+	- pip install astropy
+	- pip install shapely
+	- pip install 
