@@ -40,8 +40,8 @@ class TestLens(unittest.TestCase):
 		self.assertAlmostEqual(self.lens1.get_eq_coords_at_epoch(2017.0)[0],15.00022222)
 		self.assertAlmostEqual(self.lens1.get_eq_coords_at_epoch(2017.0)[1],60.00022222)
 
-	#def test_get_seprations_at_epoch(self):
-		self.assertAlmostEqual(self.lens1.get_angular_separation_at_epoch(2017.0,30.00069760,60.00024),90.5,places=1)
+	def test_get_seprations_at_epoch(self):
+		self.assertAlmostEqual(self.lens1.get_angular_separation_at_epoch(2017.0,30.00069760,60.00024),90.4,places=1)
 	
 		
 if __name__ == '__main__':
